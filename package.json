@@ -1,0 +1,28 @@
+{
+  "name": "arbor-common",
+  "version": "1.0.0",
+  "description": "Common library between all Arbor Astralis bots",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arbor-Astralis/arbor-common.git"
+  },
+  "keywords": [
+    "arbor-astralis",
+    "common",
+    "discord",
+    "bot"
+  ],
+  "author": "Haru",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Arbor-Astralis/arbor-common/issues"
+  },
+  "homepage": "https://github.com/Arbor-Astralis/arbor-common#readme",
+  "dependencies": {
+    "node.js": "^0.0.1-security"
+  }
+}
