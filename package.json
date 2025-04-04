@@ -23,6 +23,10 @@
   },
   "homepage": "https://github.com/Arbor-Astralis/arbor-common#readme",
   "dependencies": {
-    "node.js": "^0.0.1-security"
+    "node.js": "^0.0.1-security",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0"
   }
 }

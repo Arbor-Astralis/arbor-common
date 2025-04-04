@@ -1,18 +1,19 @@
 ﻿import * as fs from 'fs';
 import * as path from 'path';
-import * as utilities from './utilities.mjs';
 
-let _botName;
-let _botToken;
-let _botDataDirectory;
+let _botName: string;
+let _botToken: string;
+let _botDataDirectory: string;
 
 const GLOBAL_SETTINGS_FILE = "bot-settings.json";
 
+export type GlobalSettingDataString = string;
+
 export function initialize(
-    botName = utilities.required('botName'),
-    initialGlobalSettings,
-    dataDirectory
-) {
+    botName: string,
+    initialGlobalSettings: GlobalSettingDataString,
+    dataDirectory: string
+): GlobalSettingDataString | null {
     _botName = botName;
     _botDataDirectory = dataDirectory ?? path.resolve(process.cwd(), 'bot-data');
 
@@ -23,32 +24,32 @@ export function initialize(
         fs.mkdirSync(getDataDirectory());
     }
 
-    const settingsFilePath = path.resolve(getDataDirectory(), GLOBAL_SETTINGS_FILE);
+    const settingsFilePath: string = path.resolve(getDataDirectory(), GLOBAL_SETTINGS_FILE);
 
     if (initialGlobalSettings && !fs.existsSync(settingsFilePath)) {
-        const serializedData = JSON.stringify(initialGlobalSettings);
+        const serializedData: string = JSON.stringify(initialGlobalSettings);
         fs.writeFileSync(settingsFilePath, serializedData)
     }
 
-    const tokenFilePath = path.resolve(getDataDirectory(), 'bot-token.txt');
+    const tokenFilePath: string = path.resolve(getDataDirectory(), 'bot-token.txt');
     const emptyTokenString = 'input-token-here';
 
     if (!fs.existsSync(tokenFilePath)) {
         fs.writeFileSync(tokenFilePath, emptyTokenString);
         requireTokenSetup(tokenFilePath);
-        return;
+        return null;
     }
 
-    const readToken = fs.readFileSync(tokenFilePath, { encoding: 'utf8' }).replace(/\n/g, '').trim();
+    const readToken: string = fs.readFileSync(tokenFilePath, { encoding: 'utf8' }).replace(/\n/g, '').trim();
 
     if (readToken === emptyTokenString) {
         requireTokenSetup(tokenFilePath);
-        return;
+        return null;
     }
 
     _botToken = readToken;
 
-    let globalSettingsData = null;
+    let globalSettingsData: GlobalSettingDataString | null = null;
 
     if (fs.existsSync(settingsFilePath)) {
         const settingsFileContent = fs.readFileSync(settingsFilePath, 'utf8')
@@ -60,28 +61,28 @@ export function initialize(
     return globalSettingsData;
 }
 
-export function getName() {
+export function getName(): string {
     assertInitialized();
     return _botName;
 }
 
-export function getToken() {
+export function getToken(): string {
     assertInitialized();
     return _botToken;
 }
 
-export function getDataDirectory() {
+export function getDataDirectory(): string {
     assertInitialized();
     return _botDataDirectory;
 }
 
-function assertInitialized() {
+function assertInitialized(): void {
     if (!_botDataDirectory) {
         throw new Error('Bot environment is not initialized!');
     }
 }
 
-function requireTokenSetup(tokenFilePath) {
+function requireTokenSetup(tokenFilePath: string): void {
     console.error(`aa-common: bot token must be configured at: ${tokenFilePath}`);
     process.exit(1);
 }

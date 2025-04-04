@@ -1,46 +1,50 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as botEnv from "./environment.mjs";
-import {required} from "./utilities.mjs";
+import * as botEnv from "./environment.js";
 
 const GUILD_SETTINGS_DIRECTORY_NAME = "guilds";
 const GUILD_SETTINGS_FILE = 'settings.json';
 
-export class GuildSettings {
-    #guildId;
-    #data;
+export interface IGuildData {
+    settings: GuildSettings;
+    settingsFile: string;
+}
 
-    constructor(guildId = required('guildId'), data) {
+export class GuildSettings {
+    private readonly _guildId: string;
+    #data?: any;
+
+    constructor(guildId: string, data: any = null) {
         if (new.target !== GuildSettings) {
             throw new Error("Inheriting GuildSettings is forbidden");
         }
-        this.#guildId = guildId;
+        this._guildId = guildId;
         this.#data = data;
     }
 
-    get guildId() {
-        return this.#guildId;
+    get guildId(): string {
+        return this._guildId;
     }
 
-    get data() {
+    get data(): any {
         return this.#data;
     }
 
-    get toString() {
+    get toString(): string {
         return JSON.stringify(this.data, null, 4);
     }
 
-    set data(value) {
-        const guildData = resolveGuildData(this.#guildId);
-        const serializedData = JSON.stringify(value, null, 4);
+    set data(value: any) {
+        const guildData: IGuildData = resolveGuildData(this._guildId);
+        const serializedData: string = JSON.stringify(value, null, 4);
 
         fs.writeFileSync(guildData.settingsFile, serializedData, { encoding: 'utf8' });
         this.#data = value;
     }
 }
 
-export function getForGuild(guildId = required('guildId'), initialData) {
-    const guildData = resolveGuildData(guildId);
+export function getForGuild(guildId: string, initialData: any): GuildSettings {
+    const guildData: IGuildData = resolveGuildData(guildId);
 
     if (fs.existsSync(guildData.settingsFile)) {
         try {
@@ -59,36 +63,36 @@ export function getForGuild(guildId = required('guildId'), initialData) {
     return guildData.settings;
 }
 
-function resolveGuildData(guildId = required('guildId')) {
-    const guildDir = path.resolve(resolveGuildSettingsDirectory(), guildId);
+function resolveGuildData(guildId: string): IGuildData {
+    const guildDir: string = path.resolve(resolveGuildSettingsDirectory(), guildId);
 
     if (!isDirectory(guildDir)) {
         fs.mkdirSync(guildDir);
     }
 
     const settings = new GuildSettings(guildId);
-    const settingsFile = path.resolve(guildDir, GUILD_SETTINGS_FILE);
+    const settingsFile: string = path.resolve(guildDir, GUILD_SETTINGS_FILE);
 
     return { settings: settings, settingsFile: settingsFile }
 }
 
-export function removeForGuild(guildId = required('guildId')) {
-    const targetDir = path.resolve(resolveGuildSettingsDirectory(), guildId);
+export function removeForGuild(guildId: string): void {
+    const targetDir: string = path.resolve(resolveGuildSettingsDirectory(), guildId);
 
     if (isDirectory(targetDir)) {
         fs.rmdirSync(targetDir, { recursive: true });
     }
 }
 
-function resolveGuildSettingsDirectory() {
-    const guildDir = path.resolve(botEnv.getDataDirectory(), GUILD_SETTINGS_DIRECTORY_NAME);
+function resolveGuildSettingsDirectory(): string {
+    const guildDir: string = path.resolve(botEnv.getDataDirectory(), GUILD_SETTINGS_DIRECTORY_NAME);
     if (!fs.existsSync(guildDir)) {
         fs.mkdirSync(guildDir);
     }
     return guildDir;
 }
 
-function isDirectory(path) {
+function isDirectory(path: string): boolean {
     try {
         return fs.statSync(path).isDirectory();
     } catch (err) {
