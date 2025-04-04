@@ -9,11 +9,11 @@ const GLOBAL_SETTINGS_FILE = "bot-settings.json";
 
 export type GlobalSettingDataString = string;
 
-export function initialize(
+export function initialize<T>(
     botName: string,
-    initialGlobalSettings: GlobalSettingDataString,
-    dataDirectory: string
-): GlobalSettingDataString | null {
+    initialGlobalSettings?: T,
+    dataDirectory?: string
+): T | null {
     _botName = botName;
     _botDataDirectory = dataDirectory ?? path.resolve(process.cwd(), 'bot-data');
 
@@ -49,10 +49,10 @@ export function initialize(
 
     _botToken = readToken;
 
-    let globalSettingsData: GlobalSettingDataString | null = null;
+    let globalSettingsData: T | null = null;
 
     if (fs.existsSync(settingsFilePath)) {
-        const settingsFileContent = fs.readFileSync(settingsFilePath, 'utf8')
+        const settingsFileContent: string = fs.readFileSync(settingsFilePath, 'utf8')
         globalSettingsData = JSON.parse(settingsFileContent);
     }
 
